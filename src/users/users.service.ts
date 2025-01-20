@@ -17,16 +17,18 @@ export class UsersService {
   async create(userDto: CreateUserDto): Promise<User> {
     const passwordHash = await bcrypt.hash(userDto.password, this.saltRounds);
 
-    userDto.password = passwordHash;
-
-    let user: User;
+    const user = await this.usersRepository.create({
+      ...userDto,
+      password: passwordHash,
+    });
     try {
-      user = await this.usersRepository.save(userDto);
+      const result = await this.usersRepository.insert(user);
+      user.id = result.identifiers[0].id;
     } catch {
       throw new BadRequestException('user already exists');
     }
 
-    return new User(user);
+    return user;
   }
 
   findAll(): Promise<User[]> {
