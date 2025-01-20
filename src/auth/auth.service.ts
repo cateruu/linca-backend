@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { User } from 'src/users/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { JwtResponse } from './dto/jwtResponse';
 
@@ -28,15 +27,19 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, username: user.username };
+    const expiry = new Date();
+    expiry.setDate(expiry.getDate() + 1);
 
-    return { token: await this.jwtService.signAsync(payload) };
+    return {
+      token: await this.jwtService.signAsync(payload),
+      expiryDate: expiry.toISOString(),
+    };
   }
 
-  async signUp(newUser: CreateUserDto): Promise<User> {
-    const user = this.userService.create(newUser);
+  async signUp(newUser: CreateUserDto): Promise<JwtResponse> {
+    const plainPassword = newUser.password;
+    const user = await this.userService.create(newUser);
 
-    // sign in user
-
-    return user;
+    return await this.signIn(user.username, plainPassword);
   }
 }

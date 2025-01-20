@@ -1,7 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/singInDto';
-import { User } from 'src/users/users.entity';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtResponse } from './dto/jwtResponse';
 
@@ -18,7 +17,7 @@ export class AuthController {
 
   // return JWT
   @Post('/register')
-  signUp(@Body() signUpDto: CreateUserDto): Promise<User> {
+  signUp(@Body() signUpDto: CreateUserDto): Promise<JwtResponse> {
     return this.authService.signUp(signUpDto);
   }
 }
