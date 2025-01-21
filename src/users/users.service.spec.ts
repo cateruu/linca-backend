@@ -1,12 +1,10 @@
 import { UsersService } from './users.service';
 import { buildTestModule } from 'src/test-utils/test-module';
-import { setupDatabase, setupDataSource } from 'src/test-utils/setup';
+import { setupDataSource } from 'src/test-utils/setup';
 import { DataSource } from 'typeorm';
-import { IMemoryDb } from 'pg-mem';
 import { TestingModule } from '@nestjs/testing';
 
 describe('UsersService', () => {
-  let db: IMemoryDb;
   let dataSource: DataSource;
   let moduleRef: TestingModule;
   let usersService: UsersService;
@@ -25,8 +23,7 @@ describe('UsersService', () => {
   ];
 
   beforeAll(async () => {
-    db = setupDatabase();
-    dataSource = await setupDataSource(db);
+    dataSource = await setupDataSource();
     moduleRef = await buildTestModule(dataSource);
     usersService = moduleRef.get(UsersService);
   });

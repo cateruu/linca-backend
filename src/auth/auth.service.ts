@@ -23,7 +23,7 @@ export class AuthService {
     }
 
     if (!(await this.userService.comparePassword(password, user.password))) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('invalid credentials');
     }
 
     const payload = { sub: user.id, username: user.username };

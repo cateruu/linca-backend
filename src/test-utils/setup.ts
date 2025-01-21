@@ -1,8 +1,8 @@
-import { DataType, IMemoryDb, newDb } from 'pg-mem';
+import { DataType, newDb } from 'pg-mem';
 import { DataSource } from 'typeorm';
 import { v4 } from 'uuid';
 
-export const setupDatabase = () => {
+export const setupDataSource = async () => {
   const db = newDb({
     autoCreateForeignKeyIndices: true,
   });
@@ -33,10 +33,6 @@ export const setupDatabase = () => {
     });
   });
 
-  return db;
-};
-
-export const setupDataSource = async (db: IMemoryDb) => {
   const ds: DataSource = await db.adapters.createTypeormDataSource({
     type: 'postgres',
     entities: [__dirname + '/../../src/**/*.entity{.ts,.js}'],
