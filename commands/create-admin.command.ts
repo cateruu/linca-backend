@@ -51,7 +51,6 @@ export class CreateAdminCommand extends CommandRunner {
         password: hashedPassword,
         roles: [adminRole, userRole],
       });
-      console.log(admin);
       await usersRepository.save(admin);
     } catch {
       console.log('unable to create admin user');

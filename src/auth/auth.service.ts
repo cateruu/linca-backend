@@ -19,12 +19,13 @@ export class AuthService {
 
   async signIn(username: string, password: string): Promise<JwtResponse> {
     const user = await this.userService.findOne(username);
-    const roles = await this.rolesService.findForUser(user);
-    user.roles = roles;
 
     if (!user) {
       throw new NotFoundException('user not found.');
     }
+
+    const roles = await this.rolesService.findForUser(user);
+    user.roles = roles;
 
     if (!(await this.userService.comparePassword(password, user.password))) {
       throw new UnauthorizedException('invalid credentials');
