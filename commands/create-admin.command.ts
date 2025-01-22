@@ -1,5 +1,5 @@
 import { Command, CommandRunner } from 'nest-commander';
-import { Role } from 'src/roles/roles.entity';
+import { Role, Roles } from 'src/roles/roles.entity';
 import { User } from 'src/users/users.entity';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -29,12 +29,18 @@ export class CreateAdminCommand extends CommandRunner {
         return;
       }
 
-      const adminRole = await rolesRepository.findOne({
-        where: { name: 'admin' },
+      let adminRole = await rolesRepository.findOne({
+        where: { name: Roles.Admin },
+      });
+      let userRole = await rolesRepository.findOne({
+        where: { name: Roles.User },
       });
 
       if (!adminRole) {
-        await rolesRepository.save({ name: 'admin' });
+        adminRole = await rolesRepository.save({ name: Roles.Admin });
+      }
+      if (!userRole) {
+        userRole = await rolesRepository.save({ name: Roles.User });
       }
 
       const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
@@ -43,8 +49,9 @@ export class CreateAdminCommand extends CommandRunner {
         email: process.env.ADMIN_EMAIL,
         username: process.env.ADMIN_USERNAME,
         password: hashedPassword,
-        roles: [adminRole],
+        roles: [adminRole, userRole],
       });
+      console.log(admin);
       await usersRepository.save(admin);
     } catch {
       console.log('unable to create admin user');
