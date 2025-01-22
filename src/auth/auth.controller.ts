@@ -8,14 +8,12 @@ import { JwtResponse } from './dto/jwtResponse';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // return JWT
   @HttpCode(HttpStatus.OK)
   @Post('/login')
   signIn(@Body() signInDto: SignInDto): Promise<JwtResponse> {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
-  // return JWT
   @Post('/register')
   signUp(@Body() signUpDto: CreateUserDto): Promise<JwtResponse> {
     return this.authService.signUp(signUpDto);

@@ -7,16 +7,20 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtResponse } from './dto/jwtResponse';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
+    private rolesService: RolesService,
   ) {}
 
   async signIn(username: string, password: string): Promise<JwtResponse> {
     const user = await this.userService.findOne(username);
+    const roles = await this.rolesService.findForUser(user);
+    user.roles = roles;
 
     if (!user) {
       throw new NotFoundException('user not found.');
@@ -26,7 +30,11 @@ export class AuthService {
       throw new UnauthorizedException('invalid credentials');
     }
 
-    const payload = { sub: user.id, username: user.username };
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      roles: user.roles.map((role) => role.name),
+    };
     const expiry = new Date();
     expiry.setDate(expiry.getDate() + 1);
 

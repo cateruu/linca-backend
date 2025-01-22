@@ -9,7 +9,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { Role } from './roles/roles.entity';
 import { RolesModule } from './roles/roles.module';
-import { CreateAdminCommand } from './commands/create-admin.command';
 
 @Module({
   imports: [
@@ -35,7 +34,6 @@ import { CreateAdminCommand } from './commands/create-admin.command';
   providers: [
     AppService,
     { provide: APP_INTERCEPTOR, useClass: ClassSerializerInterceptor },
-    CreateAdminCommand,
   ],
 })
 export class AppModule {}
