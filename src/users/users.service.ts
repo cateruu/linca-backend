@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/roles/roles.entity';
 import { RolesService } from 'src/roles/roles.service';
+import { RequestWithUser } from 'src/auth/auth.guard';
 
 @Injectable()
 export class UsersService {
@@ -45,10 +46,22 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { username } });
   }
 
+  findById(id: string): Promise<User> {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
   async comparePassword(
     plainPass: string,
     hashedPass: string,
   ): Promise<boolean> {
     return await bcrypt.compare(plainPass, hashedPass);
+  }
+
+  checkForResourceOwner(id: string, req: RequestWithUser): boolean {
+    const { user } = req;
+    if (user.sub !== id && !user.roles.includes(Roles.Admin)) {
+      return false;
+    }
+    return true;
   }
 }

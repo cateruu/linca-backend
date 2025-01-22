@@ -4,7 +4,6 @@ import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 export enum Roles {
   User = 'user',
   Admin = 'admin',
-  Premium = 'premium',
 }
 
 @Entity('roles')

@@ -6,6 +6,17 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { Roles } from 'src/roles/roles.entity';
+
+interface TokenUser {
+  sub: string;
+  username: string;
+  roles: Roles[];
+}
+
+export interface RequestWithUser extends Request {
+  user: TokenUser;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
