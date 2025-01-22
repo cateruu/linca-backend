@@ -1,6 +1,13 @@
 import { Exclude } from 'class-transformer';
 import { IsEmail } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Role } from 'src/roles/roles.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
@@ -21,6 +28,20 @@ export class User {
   @Column({ nullable: false })
   @Exclude()
   password: string;
+
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'id',
+    },
+  })
+  roles: Role[];
 
   test() {
     return this.username;

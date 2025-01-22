@@ -7,6 +7,9 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/users.entity';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
+import { Role } from './roles/roles.entity';
+import { RolesModule } from './roles/roles.module';
+import { CreateAdminCommand } from './commands/create-admin.command';
 
 @Module({
   imports: [
@@ -20,17 +23,19 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: [User, Role],
       synchronize: process.env.DB_SYNCHRONIZE === 'true' ? true : false,
       logging: process.env.DB_LOGGING === 'true' ? true : false,
     }),
     UsersModule,
     AuthModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
     { provide: APP_INTERCEPTOR, useClass: ClassSerializerInterceptor },
+    CreateAdminCommand,
   ],
 })
 export class AppModule {}
