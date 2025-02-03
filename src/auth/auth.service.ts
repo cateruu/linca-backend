@@ -8,6 +8,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtResponse } from './dto/jwtResponse';
 import { RolesService } from 'src/roles/roles.service';
+import { User } from 'src/users/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,7 @@ export class AuthService {
 
     return {
       token: await this.jwtService.signAsync(payload),
-      expiryDate: expiry.toISOString(),
+      expiryDate: expiry,
     };
   }
 
@@ -50,5 +51,23 @@ export class AuthService {
     const user = await this.userService.create(newUser);
 
     return await this.signIn(user.username, plainPassword);
+  }
+
+  async verifyToken(token: string): Promise<User> {
+    const data = this.jwtService.decode(token);
+
+    if (!data) {
+      throw new UnauthorizedException('invalid JWT token');
+    }
+
+    const user = await this.userService.findOne(data.username);
+    if (!user) {
+      throw new UnauthorizedException('invalid JWT token');
+    }
+
+    const roles = await this.rolesService.findForUser(user);
+
+    user.roles = roles;
+    return user;
   }
 }

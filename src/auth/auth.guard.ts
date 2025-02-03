@@ -43,7 +43,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromRequest(req: Request): string | null {
-    const [type, token] = req.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : null;
+    const token = req.cookies['jwt'];
+    return token;
   }
 }

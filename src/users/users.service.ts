@@ -23,14 +23,13 @@ export class UsersService {
 
     const userRole = await this.rolesService.findOne(Roles.User);
 
-    const user = await this.usersRepository.create({
+    let user = await this.usersRepository.create({
       ...userDto,
       password: passwordHash,
       roles: [userRole],
     });
     try {
-      const result = await this.usersRepository.insert(user);
-      user.id = result.identifiers[0].id;
+      user = await this.usersRepository.save(user);
     } catch {
       throw new BadRequestException('user already exists');
     }
