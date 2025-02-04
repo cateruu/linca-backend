@@ -1,14 +1,12 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtResponse } from './dto/jwtResponse';
 import { RolesService } from 'src/roles/roles.service';
 import { User } from 'src/users/users.entity';
+import { UnauthorizedException } from 'src/exceptions/unathorized.expcetion';
+import { NotFoundException } from 'src/exceptions/not-found.exception';
 
 @Injectable()
 export class AuthService {
@@ -22,14 +20,14 @@ export class AuthService {
     const user = await this.userService.findOne(username);
 
     if (!user) {
-      throw new NotFoundException('user not found.');
+      throw new NotFoundException('User not found');
     }
 
     const roles = await this.rolesService.findForUser(user);
     user.roles = roles;
 
     if (!(await this.userService.comparePassword(password, user.password))) {
-      throw new UnauthorizedException('invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const payload = {
@@ -57,12 +55,12 @@ export class AuthService {
     const data = this.jwtService.decode(token);
 
     if (!data) {
-      throw new UnauthorizedException('invalid JWT token');
+      throw new UnauthorizedException('Invalid JWT token');
     }
 
     const user = await this.userService.findOne(data.username);
     if (!user) {
-      throw new UnauthorizedException('invalid JWT token');
+      throw new UnauthorizedException('Invalid JWT token');
     }
 
     const roles = await this.rolesService.findForUser(user);

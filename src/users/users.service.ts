@@ -1,12 +1,13 @@
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './users.entity';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Roles } from 'src/roles/roles.entity';
 import { RolesService } from 'src/roles/roles.service';
 import { RequestWithUser } from 'src/auth/auth.guard';
+import { UsernameTakenException } from 'src/exceptions/username-taken.expcetion';
 
 @Injectable()
 export class UsersService {
@@ -30,8 +31,15 @@ export class UsersService {
     });
     try {
       user = await this.usersRepository.save(user);
-    } catch {
-      throw new BadRequestException('user already exists');
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        console.log(error.driverError.detail);
+        if (error.driverError.detail.includes('email')) {
+          throw new UsernameTakenException('Email already in use');
+        } else {
+          throw new UsernameTakenException('Username is already taken');
+        }
+      }
     }
 
     return user;
