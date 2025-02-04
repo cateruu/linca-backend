@@ -32,6 +32,12 @@ export class AuthController {
     return resp;
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('/logout')
+  async signOut(@Res({ passthrough: true }) res: Response) {
+    res.cookie('jwt', '', { expires: new Date(), httpOnly: true });
+  }
+
   @Post('/register')
   async signUp(
     @Body() signUpDto: CreateUserDto,
